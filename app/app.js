@@ -9,7 +9,10 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
-
+//mongodb setup
+var mongoose = require('mongoose');
+mongoose.Promise = global.Promise;
+mongoose.connect('mongodb://localhost/patsr').then(() => console.log('connection successful!')).catch((err) => console.error(err));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
