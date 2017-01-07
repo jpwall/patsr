@@ -1,5 +1,16 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  script(src='http://zeptojs.com/zepto.min.js')
+  script(src='/javascripts/index.js')
+  form#formNewPost(name="addpost",method="post", action="/newText")
+    input#inputTitle(type="text", placeholder="Title", name="title")
+    input#inputContent(type="text", placeholder="Content", name="content")
+    input#inputContent(type="text", placeholder="Tags", name="tags")
+    button#btnPost(type="submit") Post
+  div
+  - for (var i = count-1; i >= 0; i--)
+    div
+      h1!=post[i].title
+      p!=post[i].content
+      p!=post[i].tags
