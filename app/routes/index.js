@@ -22,7 +22,7 @@ router.post('/newText', function(req, res, next) {
 
     textPost.create({title: title, content: content, tags: tags}, function(err, textPost) {
 	if (err) return next(err);
-	res.json(textPost);
+	res.send('<p>Permanent post URL: example.com/postId/' + textPost._id + '</p><br><a href="/">Back to home</a>');
     });
 });
 
