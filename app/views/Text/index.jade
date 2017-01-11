@@ -1,0 +1,9 @@
+extends ../layout
+
+block content
+  form#formNewPost(name="addpost", method="post", action="/newText")
+    input(type="hidden", name="type", value="text")
+    input#inputTitle(type="text", placeholder="Title", name="title")
+    input#inputContent(type="text", placeholder="Content", name="content")
+    input#inputTags(type="text", placeholder="Tags", name="tags")
+    button#btnPost(type="submit") Post
