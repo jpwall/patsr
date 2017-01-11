@@ -1,16 +1,13 @@
 extends layout
 
 block content
-  script(src='http://zeptojs.com/zepto.min.js')
-  script(src='/javascripts/index.js')
-  form#formNewPost(name="addpost",method="post", action="/newText")
-    input#inputTitle(type="text", placeholder="Title", name="title")
-    input#inputContent(type="text", placeholder="Content", name="content")
-    input#inputContent(type="text", placeholder="Tags", name="tags")
-    button#btnPost(type="submit") Post
+  a(href="/Text") New Text Post
+  a(href="/Image") New Image Post
   div
   - for (var i = count-1; i >= 0; i--)
-    div
+    div(style="border-width:5px;border-style:solid;")
       h1!=post[i].title
+      p!=post[i].type
       p!=post[i].content
       p!=post[i].tags
+      p!=post[i]._id
