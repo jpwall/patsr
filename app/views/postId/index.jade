@@ -1,8 +1,25 @@
 extends ../layout
 
 block content
-  div(style="border-width:5px;border-style:solid;")
-    h1!=post.title
-    p!=post.type
-    p!=post.content
-    p!=post.tags
+  h1!=post.title
+  - if (post.type == "text") {
+    div(style="border-width:5px;border-style:solid;")
+      p!=post.content
+      div
+      - for (var j = 0; j < post.tags.length; j++) {
+        a(href="tag/"+post.tags[j])!=post.tags[j]+"  "
+      - }
+      p!=post._id
+  - }
+  - if (post.type == "image") {
+    div(style="border-width:5px;border-style:solid;")
+      - for (var j = 0; j < post.content.length; j++) {
+        img(src=post.content[j] style="max-width:100%;")
+      - }
+      p!=post.caption
+      div
+      - for (var j = 0; j < post.tags.length; j++) {
+        a(href="tag/"+post.tags[j])!=post.tags[j]+"  "
+      - }
+      p!=post._id
+  - }
