@@ -1,0 +1,23 @@
+extends ../layout
+
+block content
+  a(href="/Text") New Text Post
+  a(href="/Image") New Image Post
+  div
+  - for (var i = count-1; i >= 0; i--) {
+    - if (post[i].type == "text") {
+      div(style="border-width:5px;border-style:solid;")
+        h1!=post[i].title
+        p!=post[i].content
+        p!=post[i]._id
+    - }
+    - if (post[i].type == "image") {
+      div(style="border-width:5px;border-style:solid;")
+        h1!=post[i].title
+        - for (var j = 0; j < post[i].content.length; j++) {
+          img(src=post[i].content[j] style="max-width:100%;")
+        - }
+        p!=post[i].caption
+        p!=post[i]._id
+    - }
+  - }
