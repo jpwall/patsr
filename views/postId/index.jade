@@ -1,25 +1,30 @@
 extends ../layout
 
 block content
-  h1!=post.title
+  //div#postBox(style="border-width:5px;border-style:solid;")
+    //h1!=post.title
   - if (post.type == "text") {
-    div(style="border-width:5px;border-style:solid;")
+    div#postBox(style="border-width:5px;border-style:solid;")
+      h1!=post.title
       p!=post.content
-      div
+      div#tagContainer
       - for (var j = 0; j < post.tags.length; j++) {
-        a(href="tag/"+post.tags[j])!=post.tags[j]+"  "
+        a#tag(href="tag/"+post.tags[j])!=post.tags[j]+"  "
       - }
-      p!=post._id
+      br
+      a(href="/postId/"+post._id)!="Permanent URL Link"
   - }
   - if (post.type == "image") {
-    div(style="border-width:5px;border-style:solid;")
+    div#postBox(style="border-width:5px;border-style:solid;")
+      h1!=post.title
       - for (var j = 0; j < post.content.length; j++) {
         img(src=post.content[j] style="max-width:100%;")
       - }
       p!=post.caption
-      div
+      div#tagContainer
       - for (var j = 0; j < post.tags.length; j++) {
-        a(href="tag/"+post.tags[j])!=post.tags[j]+"  "
+        a#tag(href="tag/"+post.tags[j])!=post.tags[j]+"  "
       - }
-      p!=post._id
+      br
+      a(href="/postId/"+post._id)!="Permanent URL Link"
   - }
