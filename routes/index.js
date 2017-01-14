@@ -2,12 +2,24 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var Posts = require('../dbModels/posts.js');
+var privKey = require('./privKey.js');
 var bodyParser = require('body-parser');
+var recaptcha = require('express-recaptcha');
+
+recaptcha.init('6LcpzREUAAAAAMb2qn7aobDAldkSgBX_fq7tpOXj', global.privKey);
 
 /* GET home page and specify variables. */
 router.get('/', function(req, res, next) {
     Posts.count({}, function(err, documentCount){
 	Posts.find({}, function(err, postData) {
+	    for (var i = 0; i < documentCount; i++) {
+		if (postData.title != null) {
+		    postData[i].title[0] = postData[i].title[0].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		}
+		if (postData[i].content != null) {
+		    postData[i].content[0] = postData[i].content[0].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		}
+	    }
 	    if (err) return next(err);
 	    res.render('index', { post: postData, count: documentCount });
 	});
@@ -22,7 +34,7 @@ router.get('/postId/:id', function (req, res, next) {
 });
 
 router.get('/Text', function(req, res, next) {
-    res.render('Text/index');
+    res.render('Text/index', { captcha:recaptcha.render() });
 });
 
 router.get('/Image', function(req, res, next) {
@@ -31,31 +43,44 @@ router.get('/Image', function(req, res, next) {
 
 /* POST request to /newText creates new text post */
 router.post('/newText', function(req, res, next) {
-    var type = req.body.type;
-    var title = req.body.title;
-    var content = req.body.content;
-    var tags = req.body.tags;
-    var tagsSplit = tags.split(', ');
-    
-    Posts.create({type: type, title: title, content: content, tags: tagsSplit}, function(err, textPost) {
-	if (err) return next(err);
-	res.send('<p>Permanent post URL: example.com/postId/' + textPost._id + '</p><br><a href="/">Back to home</a>');
-	console.log(textPost.tags);
+    recaptcha.verify(req, function(error) {
+	if(!error) {
+	    var type = req.body.type;
+	    var title = req.body.title;
+	    var content = req.body.content;
+	    var tags = req.body.tags;
+	    var tagsSplit = tags.split(', ');
+
+	    Posts.create({type: type, title: title, content: content, tags: tagsSplit}, function(err, textPost) {
+		if (err) return next(err);
+		res.send('<p>Permanent post URL: example.com/postId/' + textPost._id + '</p><br><a href="/">Back to home</a>');
+	    });
+	}
+	else {
+	    res.send('ERROR');
+	}
     });
 });
 
 router.post('/newImage', function(req, res, next) {
-    var type = req.body.type;
-    var title = req.body.title;
-    var content = req.body.content;
-    var contentSplit = content.split(', ');
-    var caption = req.body.caption;
-    var tags = req.body.tags;
-    var tagsSplit = tags.split(', ');
-
-    Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit}, function(err, imagePost) {
-	if (err) return next(err);
-	res.send('<p>Permanent post URL: example.com/postId/' + imagePost._id + '</p><br><a href="/">Back to home</a>');
+    recaptcha.verify(req, function(error) {
+	if(!error) {
+	    var type = req.body.type;
+	    var title = req.body.title;
+	    var content = req.body.content;
+	    var contentSplit = content.split(', ');
+	    var caption = req.body.caption;
+	    var tags = req.body.tags;
+	    var tagsSplit = tags.split(', ');
+	    
+	    Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit}, function(err, imagePost) {
+		if (err) return next(err);
+		res.send('<p>Permanent post URL: example.com/postId/' + imagePost._id + '</p><br><a href="/">Back to home</a>');
+	    });
+	}
+	else {
+	    res.send('ERROR');
+	}
     });
 });
 
