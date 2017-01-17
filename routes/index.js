@@ -11,15 +11,7 @@ recaptcha.init('6LcpzREUAAAAAMb2qn7aobDAldkSgBX_fq7tpOXj', global.privKey);
 /* GET home page and specify variables. */
 router.get('/', function(req, res, next) {
     Posts.count({}, function(err, documentCount){
-	Posts.find({}, function(err, postData) {
-	    for (var i = 0; i < documentCount; i++) {
-		if (postData.title != null) {
-		    postData[i].title[0] = postData[i].title[0].replace(/</g, "&lt;").replace(/>/g, "&gt;");
-		}
-		if (postData[i].content != null) {
-		    postData[i].content[0] = postData[i].content[0].replace(/</g, "&lt;").replace(/>/g, "&gt;");
-		}
-	    }
+	Posts.find({}).sort({"date": 1}).exec( function(err, postData) {
 	    if (err) return next(err);
 	    res.render('index', { post: postData, count: documentCount });
 	});
@@ -50,6 +42,18 @@ router.post('/newText', function(req, res, next) {
 	    var content = req.body.content;
 	    var tags = req.body.tags;
 	    var tagsSplit = tags.split(', ');
+
+	    if (title != null) {
+		title = title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+	    }
+	    if (content != null) {
+		content = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+	    }
+	    for (var i = 0; i < tagsSplit.length; i++) {
+		if (tagsSplit[i] != null) {
+		    tagsSplit[i] = tagsSplit[i].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		}
+	    }
 
 	    Posts.create({type: type, title: title, content: content, tags: tagsSplit}, function(err, textPost) {
 		if (err) return next(err);
