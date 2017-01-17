@@ -22,7 +22,7 @@ block content
       - }
       p!=post.caption
       div#tagContainer
-      - for (var j = 0; j < post.tags.length; j++) {
+      - for (var j = 0; j < post.tags.length; j++) {      
         a#tag(href="tag/"+post.tags[j])!=post.tags[j]+"  "
       - }
       br
