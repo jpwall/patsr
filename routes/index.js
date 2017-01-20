@@ -11,10 +11,35 @@ recaptcha.init('6LcpzREUAAAAAMb2qn7aobDAldkSgBX_fq7tpOXj', global.privKey);
 /* GET home page and specify variables. */
 router.get('/', function(req, res, next) {
     Posts.count({}, function(err, documentCount){
-	Posts.find({}).sort({"date": 1}).exec( function(err, postData) {
-	    if (err) return next(err);
-	    res.render('index', { post: postData, count: documentCount });
-	});
+	if (documentCount > 100) {
+	    Posts.find({}).sort({"date": 1}).skip(documentCount-100).limit(100).exec( function(err, postData) {
+		if (err) return next(err);
+		res.render('index-paginated', { post: postData, page: 0, count: 100 });
+	    });
+	}
+	else {
+	    Posts.find({}).sort({"date": 1}).exec( function(err, postData) {
+		if (err) return next(err);
+		res.render('index', { post: postData, count: documentCount });
+	    });
+	}
+    });
+});
+
+router.get('/page/:page', function(req, res, next) {
+    Posts.count({}, function(err, documentCount) {
+	if (documentCount%100 != 0 && req.params.page >= parseInt(documentCount/100)) {
+	    Posts.find({}).sort({"date": 1}).limit(documentCount%100).exec( function(err, postData) {
+		if (err) return next(err);
+		res.render('index', { post: postData, count: documentCount%100 });
+	    });
+	}
+	else {
+	    Posts.find({}).sort({"date": 1}).skip(documentCount-(100*req.params.page)).limit(100).exec( function(err, postData) {
+		if (err) return next(err);
+		res.render('index-paginated', { post: postData, page: req.params.page, count: 100 });
+	    });
+	}
     });
 });
 
