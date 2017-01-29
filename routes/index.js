@@ -43,6 +43,39 @@ router.get('/page/:page', function(req, res, next) {
     });
 });
 
+router.get('/tag/:tag', function(req, res, next) {
+    Posts.count({tags: req.params.tag }, function(err, documentCount) {
+	if (documentCount > 100) {
+	    Posts.find({tags: req.params.tag}).sort({"date": 1}).skip(documentCount-100).limit(100).exec( function(err, postData) {
+		if (err) return next(err);
+		res.render('tag/index-paginated', { post: postData, page: 0, count: 100 });
+	    });
+	}
+	else {
+	    Posts.find({tags: req.params.tag}).sort({"date": 1}).exec( function(err, postData) {
+		if (err) return next(err);
+		res.render('index', { post: postData, count: documentCount });
+	    });
+	}
+    });
+});
+
+router.get('/tag/:tag/page/:page', function(req, res, next) {
+    Posts.count({tags: req.params.tag}, function(err, documentCount) {
+	if (documentCount%100 != 0 && req.params.page >= parseInt(documentCount/100)) {
+	    Posts.find({tags: req.params.tag}).limit(documentCount%100).exec( function(err, postData) {
+		res.render('index', { post: postData, count: documentCount%100 });
+	    });
+	}
+	else {
+	    Posts.find({tags: req.params.tag}).skip(documentCount-(100*req.params.page)).limit(100).exec( function(err, postData) {
+		if (err) return next(err);
+		res.render('tag/index-paginated', { post: postData, page: req.params.page, count: 100});
+	    });
+	}
+    });
+});
+
 router.get('/postId/:id', function (req, res, next) {
     Posts.findById(req.params.id, function(err, postData) {
 	if(err) res.send(err);
@@ -68,6 +101,10 @@ router.post('/newText', function(req, res, next) {
 	    var tags = req.body.tags;
 	    var tagsSplit = tags.split(', ');
 
+	    if (tags.indexOf('#') != -1 || tags.indexOf('$') != -1 || tags.indexOf(';') != -1) {
+		res.send(res.render('error/tagParsing'));
+	    }
+	    else {
 	    if (title != null) {
 		title = title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	    }
@@ -82,11 +119,12 @@ router.post('/newText', function(req, res, next) {
 
 	    Posts.create({type: type, title: title, content: content, tags: tagsSplit}, function(err, textPost) {
 		if (err) return next(err);
-		res.send('<p>Permanent post URL: example.com/postId/' + textPost._id + '</p><br><a href="/">Back to home</a>');
+		res.send(res.render('post/new', {postId: textPost._id}));
 	    });
+	    }
 	}
 	else {
-	    res.send('ERROR');
+	    res.send(res.render('error/reCAPTCHA'));
 	}
     });
 });
@@ -101,14 +139,16 @@ router.post('/newImage', function(req, res, next) {
 	    var caption = req.body.caption;
 	    var tags = req.body.tags;
 	    var tagsSplit = tags.split(', ');
-	    
+	    if (tags.indexOf('#') != -1 || tags.indexOf('$') != -1 || tags.indexOf(';') != -1) {
+		res.send(res.render('error/tagParsing'));
+	    }
 	    Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit}, function(err, imagePost) {
 		if (err) return next(err);
-		res.send('<p>Permanent post URL: example.com/postId/' + imagePost._id + '</p><br><a href="/">Back to home</a>');
+		res.send(res.render('post/new', {postId: imagePost._id}));
 	    });
 	}
 	else {
-	    res.send('ERROR');
+	    res.send(res.render('error/reCAPTCHA'));
 	}
     });
 });
@@ -116,7 +156,7 @@ router.post('/newImage', function(req, res, next) {
 router.get('/tag/:tag', function (req, res, next) {
     Posts.count({tags: req.params.tag}, function(err, postCount) {
 	Posts.find({tags: req.params.tag}, function(err, postData) {
-	    res.render('tag/index', {post: postData, count: postCount});
+	    res.render('index', {post: postData, count: postCount});
 	});
     });
 });
