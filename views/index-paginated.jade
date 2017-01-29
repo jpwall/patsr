@@ -3,40 +3,41 @@ extends layout
 block content
   a(href="/Text") New Text Post
   a(href="/Image") New Image Post
-  div#postContainer
+  div.postContainer
   h1 PATSR is under development at the moment - <u>expect unreliablity or complete lack of function</u>
   - for (var i = count-1; i >= 0; i--) {
     - if (post[i].type == "text") {
-    div#postBox(style="border-width:5px;border-style:solid;")
+    div.postBox(style="border-width:5px;border-style:solid;")
       h1!=post[i].title
       p!=post[i].content
-      div#tagContainer
+      div.tagContainer
       - for (var j = 0; j < post[i].tags.length; j++) {
         - if (post[i].tags[j] != "") {
-          a#tag(href="tag/"+post[i].tags[j])!="#"+post[i].tags[j]+"  "
+          a.tag(href="tag/"+post[i].tags[j])!="#"+post[i].tags[j]+"  "
         - }
       - }
       br
-      a(href="/postId/"+post[i]._id)!="Permanent URL Link"
+      a.urlLink(href="/postId/"+post[i]._id)!="Permanent URL Link"
     - }
     - if (post[i].type == "image") {
-    div#postBox(style="border-width:5px;border-style:solid;")
+    div.postBox(style="border-width:5px;border-style:solid;")
       h1!=post[i].title
       - for (var j = 0; j < post[i].content.length; j++) {
-        img#postImg(src=post[i].content[j] style="max-width:100%;")
+        a.imgLink(href=post[i].content[j])
+          img.postImg(src=post[i].content[j] style="max-width:100%;")
       - }
       p!=post[i].caption
-      div#tagContainer
+      div.tagContainer
       - for (var j = 0; j < post[i].tags.length; j++) {
         - if (post[i].tags[j] != "") {
-          a#tag(href="tag/"+post[i].tags[j])!="#"+post[i].tags[j]+"  "
+          a.tag(href="tag/"+post[i].tags[j])!="#"+post[i].tags[j]+"  "
         - }
       - }
       br
-      a(href="/postId/"+post[i]._id)!="Permanent URL Link"
+      a.urlLink(href="/postId/"+post[i]._id)!="Permanent URL Link"
     - }
   - }
-  a(href="/page/"+(page+1))!="Next Page"
+  a.pageButton(href="/page/"+(page+1))!="Next Page"
   - if (page > 1) {
-    a(href="/page/"+(page-1))!="Previous Page"
+    a.pageButton(href="/page/"+(page-1))!="Previous Page"
   - }
