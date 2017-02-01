@@ -1,19 +1,16 @@
 extends layout
 
 block content
-  a(href="/Text") New Text Post
-  a(href="/Image") New Image Post
   div.postContainer
-  h1 PATSR is under development at the moment - <u>expect unreliablity or complete lack of function</u>
   - for (var i = count-1; i >= 0; i--) {
     - if (post[i].type == "text") {
     div.postBox(style="border-width:5px;border-style:solid;")
-      h1!=post[i].title
-      p!=post[i].content
+      div.bigTitle!=post[i].title
+      div.normalText!=post[i].content
       div.tagContainer
       - for (var j = 0; j < post[i].tags.length; j++) {
         - if (post[i].tags[j] != "") {
-          a.tag(href="tag/"+post[i].tags[j])!="#"+post[i].tags[j]+"  "
+          a.tag(href="/tag/"+post[i].tags[j])!="#"+post[i].tags[j]+"  "
         - }
       - }
       br
@@ -21,16 +18,16 @@ block content
     - }
     - if (post[i].type == "image") {
     div.postBox(style="border-width:5px;border-style:solid;")
-      h1!=post[i].title
+      div.bigTitle!=post[i].title
       - for (var j = 0; j < post[i].content.length; j++) {
         a.imgLink(href=post[i].content[j])
           img.postImg(src=post[i].content[j] style="max-width:100%;")
       - }
-      p!=post[i].caption
+      div.normalText!=post[i].caption
       div.tagContainer
       - for (var j = 0; j < post[i].tags.length; j++) {
         - if (post[i].tags[j] != "") {
-          a.tag(href="tag/"+post[i].tags[j])!="#"+post[i].tags[j]+"  "
+          a.tag(href="/tag/"+post[i].tags[j])!="#"+post[i].tags[j]+"  "
         - }
       - }
       br

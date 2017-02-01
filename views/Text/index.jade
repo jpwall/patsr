@@ -2,10 +2,11 @@ extends ../layout
 
 block content
   script(src="https://www.google.com/recaptcha/api.js")
-  form#formNewPost(name="addpost", method="post", action="/newText")
+  form#formNewPost.postContainer(name="addpost", method="post", action="/newText")
     input(type="hidden", name="type", value="text")
-    input#inputTitle(type="text", placeholder="Title", name="title")
-    input#inputContent(type="text", placeholder="Content", name="content")
-    input#inputTags(type="text", placeholder="Tags", name="tags")
+    input#inputText.inputBox(type="text", placeholder="Title", name="title")
+    input#inputText.inputBox(type="text", placeholder="Content", name="content")
+    input#inputText.inputBox(type="text", placeholder="Tags (separated by commas)", name="tags")
     div.g-recaptcha(data-sitekey="6LcpzREUAAAAAMb2qn7aobDAldkSgBX_fq7tpOXj")
-    button#btnPost(type="submit") Post
+    button(type="submit")
+      div.postButton Post!

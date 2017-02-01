@@ -1,31 +1,30 @@
 extends ../layout
 
 block content
-  //div#postBox(style="border-width:5px;border-style:solid;")
-    //h1!=post.title
-  - if (post.type == "text") {
-    div.postBox(style="border-width:5px;border-style:solid;")
-      h1!=post.title
-      p!=post.content
-      div.tagContainer
-      - for (var j = 0; j < post.tags.length; j++) {
-        a.tag(href="tag/"+post.tags[j])!=post.tags[j]+"  "
-      - }
-      br
-      a.urlLink(href="/postId/"+post._id)!="Permanent URL Link"
-  - }
-  - if (post.type == "image") {
-    div.postBox(style="border-width:5px;border-style:solid;")
-      h1!=post.title
-      - for (var j = 0; j < post.content.length; j++) {
-        a(href=post.content[j])
-          img.postImg(src=post.content[j] style="max-width:100%;")
-      - }
-      p!=post.caption
-      div.tagContainer
-      - for (var j = 0; j < post.tags.length; j++) {      
-        a.tag(href="tag/"+post.tags[j])!="#"+post.tags[j]+"  "
-      - }
-      br
-      a.urlLink(href="/postId/"+post._id)!="Permanent URL Link"
-  - }
+  div.postContainer
+    - if (post.type == "text") {
+      div.postBox
+        div.bigTitle!=post.title
+        div.normalText!=post.content
+        div.tagContainer
+        - for (var j = 0; j < post.tags.length; j++) {
+          a.tag(href="/tag/"+post.tags[j])!="#"+post.tags[j]+"  "
+        - }
+        br
+        a.urlLink(href="/postId/"+post._id)!="Permanent URL Link"
+    - }
+    - if (post.type == "image") {
+      div.postBox
+        div.bigTitle!=post.title
+        - for (var j = 0; j < post.content.length; j++) {
+          a(href=post.content[j])
+            img.postImg(src=post.content[j] style="max-width:100%;")
+        - }
+        div.normalText!=post.caption
+        div.tagContainer
+        - for (var j = 0; j < post.tags.length; j++) {      
+          a.tag(href="/tag/"+post.tags[j])!="#"+post.tags[j]+"  "
+        - }
+        br
+        a.urlLink(href="/postId/"+post._id)!="Permanent URL Link"
+    - }

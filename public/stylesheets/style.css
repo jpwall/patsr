@@ -1,6 +1,102 @@
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro');
+
 body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  //padding: 50px;
+  font: 14px "Source Sans Pro", sans-serif;
+  background: #555555;
+  color: #ffadd3;
+}
+
+.biggestTitle {
+    font-size: 55px;
+}
+
+.bigTitle {
+    font-size: 35px;
+}
+
+.normalText {
+    font-size: 18px;
+}
+
+.newPostHeader {
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-flow: row;
+    //justify-content: space-around;
+    margin-bottom: 5px;
+}
+
+.newPostButton {
+    //width: 100%;
+    height: auto;
+    text-align: center;
+    color: #66a0ff;
+    font-size: 37px;
+}
+
+.postContainer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    flex-flow: column;
+}
+
+.postBox {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 60%;
+    //border-width: 5px;
+    //border-style: solid;
+    margin-bottom: 5px;
+    padding: 30px 20px 30px 20px;
+    background: #333333;
+}
+
+.tagContainer {
+    margin-bottom: 10px;
+}
+
+.tag {
+    color: white;
+    //text-decoration: none;
+}
+
+.urlLink {
+    color: #fbffb5;
+}
+
+.inputBox {
+    width: 52%;
+    height: 20px;
+    margin-bottom: 4px;
+    padding: 8px 8px;
+    //color: black;
+    background: #444444;
+    border: none;
+}
+
+#inputText {
+    color: #b5b5ff;
+}
+
+#inputImage {
+    color: #b5ffd5;
+}
+
+.postButton {
+    width: 100px;
+    height: 40px;
+    background: #87b5ff;
+    font-size: 25px;
+}
+
+button {
+    border: none;
+    background: none;
 }
 
 a {
