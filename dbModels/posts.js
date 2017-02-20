@@ -6,6 +6,7 @@ var Posts = new mongoose.Schema({
     content: Array,
     caption: String,
     tags: Array,
+    views: Number,
     date: { type: Date, default: Date.now }
 });
 
