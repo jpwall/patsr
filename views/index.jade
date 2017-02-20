@@ -1,11 +1,18 @@
 extends layout
 
 block content
+  div.newPostHeader
+    a(href="/Text" style="width: 50%;text-decoration:none;font-size:25px;")
+      div.newPostButton(style="background:#e7adff;") New Text Post
+    a(href="/Image" style="width: 50%;text-decoration:none;font-size:25px;")
+      div.newPostButton(style="background:#adffe2;") New Image Post
   div.postContainer
     - for (var i = count-1; i >= 0; i--) {
       - if (post[i].type == "text") {
       div.postBox
-        div.bigTitle!=post[i].title
+        div.titleBox
+          div.bigTitle!=post[i].title
+          div.normalText!="VIEWS: "+post[i].views
         div.normalText!=post[i].content
         div.tagContainer
         - for (var j = 0; j < post[i].tags.length; j++) {
@@ -18,7 +25,9 @@ block content
       - }
       - if (post[i].type == "image") {
       div.postBox
-        div.bigTitle!=post[i].title
+        div.titleBox
+          div.bigTitle!=post[i].title
+          div.normalText!="VIEWS: "+post[i].views
         - for (var j = 0; j < post[i].content.length; j++) {
           a.imgLink(href=post[i].content[j])
             img.postImg(src=post[i].content[j] style="max-width:100%;")
@@ -32,5 +41,17 @@ block content
         - }
         br
         a.urlLink(href="/postId/"+post[i]._id)!="Permanent URL Link"
+      - }
+    - }
+    - if (pageIdentifier == "paginated") {
+      a.pageButton(href="/page/"+(page+1))!="Next Page"
+      - if (page > 1) {
+        a.pageButton(href="/page/"+(page-1))!="Previous Page"
+      - }
+    - }
+    - if (pageIdentifier == "paginated-tag") {
+      a.pageButton(href="/tag/"+tag+"/page/"+(page+1))!="Next Page"
+      - if (page > 1) {
+        a.pageButton(href="/tag/"+tag+"/page/"+(page-1))!="Previous Page"
       - }
     - }
