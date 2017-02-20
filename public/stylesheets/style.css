@@ -13,10 +13,14 @@ body {
 
 .bigTitle {
     font-size: 35px;
+    white-space: normal;
+    word-break: break-all;
 }
 
 .normalText {
     font-size: 18px;
+    //white-space: normal;
+    //word-break: break-all;
 }
 
 .newPostHeader {
@@ -54,6 +58,15 @@ body {
     margin-bottom: 5px;
     padding: 30px 20px 30px 20px;
     background: #333333;
+}
+
+.titleBox {
+    display: flex;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .tagContainer {
