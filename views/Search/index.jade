@@ -1,0 +1,10 @@
+extends ../layout
+
+block content
+  form#formNewPost.postContainer(name="newSearch", method="post", action="/Search")
+    input.inputBox(type="text", placeholder="Tags (separated by commas)", name="search")
+    select(name="type")
+      option(value="include") Include
+      option(value="exclude") Exclude
+    button(type="submit")
+      div.postButton Search
