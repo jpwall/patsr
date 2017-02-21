@@ -60,13 +60,17 @@ router.get('/page/:page', function(req, res, next) {
 	}
 	Posts.find({}).sort({"date": -1}).skip(req.params.page*100).limit(20).exec( function(err, data) {
 	    var v = Posts.update({"_id": {$in: data}}, {$inc: {"views": 1}}, {multi: true});
+	    v.exec(function(err) {
+		if (err) return next(err);
+	    });
 	});
     });
 });
 
 router.get('/tag/:tag', function(req, res, next) {
     var allTags = req.params.tag;
-    var tagSplit = allTags.split(', ');
+    var allTagsLower = allTags.toLowerCase();
+    var tagSplit = allTagsLower.split(', ');
     Posts.count({tags: { $all: tagSplit } }, function(err, documentCount) {
 	if (documentCount > 100) {
 	    Posts.find({tags: { $all: tagSplit } }).sort({"date": 1}).skip(documentCount-100).limit(100).exec( function(err, postData) {
@@ -80,12 +84,19 @@ router.get('/tag/:tag', function(req, res, next) {
 		res.render('index', { post: postData, count: documentCount });
 	    });
 	}
+	Posts.find({tags: { $all: tagSplit } }).sort({"date": -1}).limit(20).exec( function(err, data) {
+	    var v = Posts.update({"_id": {$in: data}}, {$inc: {"views": 1}}, {multi: true});
+	    v.exec(function(err) {
+		if (err) return next(err);
+	    });
+	});
     });
 });
 
 router.get('/tag/:tag/page/:page', function(req, res, next) {
     var allTags = req.params.tag;
-    var tagSplit = allTags.split(', ');
+    var allTagsLower = allTags.toLowerCase();
+    var tagSplit = allTagsLower.split(', ');
     Posts.count({tags: { $all: tagSplit }}, function(err, documentCount) {
 	if (documentCount%100 != 0 && req.params.page >= parseInt(documentCount/100)) {
 	    Posts.find({tags: { $all: tagSplit } }).limit(documentCount%100).exec( function(err, postData) {
@@ -95,15 +106,22 @@ router.get('/tag/:tag/page/:page', function(req, res, next) {
 	else {
 	    Posts.find({tags: { $all: tagSplit } }).skip(documentCount-(100*req.params.page)).limit(100).exec( function(err, postData) {
 		if (err) return next(err);
-		res.render('index', { post: postData, page: req.params.page, count: 100, pageIdentifier: "paginated-tag", tag: req.params.tag });
+		res.render('index', { post: postData, page: req.params.page, count: 100, pageIdentifier: "paginated"});
 	    });
 	}
+	Posts.find({tags: { $all: tagSplit } }).sort({"date": -1}).skip(100*req.params.page).limit(20).exec( function(err, data) {
+	    var v = Posts.update({"_id": {$in: data}}, {$inc: {"views": 1}}, {multi: true});
+	    v.exec(function(err) {
+		if (err) return next(err);
+	    });
+	});
     });
 });
 
 router.get('/exclude/:tag', function(req, res, next) {
     var allTags = req.params.tag;
-    var tagSplit = allTags.split(', ');
+    var allTagsLower = allTags.toLowerCase();
+    var tagSplit = allTagsLower.split(', ');
     Posts.count({tags: { $nin: tagSplit } }).exec( function(err, documentCount) {
 	if (documentCount > 100) {
 	    Posts.find({tags: { $nin: tagSplit } }).sort({"date": 1}).skip(documentCount-100).limit(100).exec( function(err, postData) {
@@ -118,15 +136,50 @@ router.get('/exclude/:tag', function(req, res, next) {
 		res.render('index', { post: postData, count: documentCount });
 	    });
 	}
+	Posts.find({tags: { $nin: tagSplit } }).sort({"date": -1}).limit(20).exec( function(err, data) {
+	    var v = Posts.update({"_id": {$in: data}}, {$inc: {"views": 1}}, {multi: true});
+	    v.exec(function(err) {
+		if (err) return next(err);
+	    });
+	});
     });
 });
+
+router.get('/exclude/:tag/page/:page', function(req, res, next) {
+    var allTags = req.params.tag;
+    var allTagsLower = allTags.toLowerCase();
+    var tagSplit = allTagsLower.split(', ');
+    Posts.count({tags: { $nin: tagSplit }}, function(err, documentCount) {
+	if (documentCount%100 != 0 && req.params.page >= parseInt(documentCount/100)) {
+	    Posts.find({tags: { $nin: tagSplit } }).limit(documentCount%100).exec( function(err, postData) {
+		res.render('index', { post: postData, count: documentCount%100 });
+	    });
+	}
+	else {
+	    Posts.find({tags: { $nin: tagSplit } }).skip(documentCount-(100*req.params.page)).limit(100).exec( function(err, postData) {
+		if (err) return next(err);
+		res.render('index', { post: postData, page: req.params.page, count: 100, pageIdentifier: "paginated"});
+	    });
+	}
+	Posts.find({tags: { $nin: tagSplit } }).sort({"date": -1}).skip(100*req.params.page).limit(20).exec( function(err, data) {
+	    var v = Posts.update({"_id": {$in: data}}, {$inc: {"views": 1}}, {multi: true});
+	    v.exec(function(err) {
+		if (err) return next(err);
+	    });
+	});
+    });
+});
+
 
 router.get('/postId/:id', function (req, res, next) {
     Posts.find({"_id": req.params.id}, function(err, postData) {
 	if(err) res.send(err);
 	res.render('index', { post: postData, count: 1 });
+	var v = Posts.update({"_id": {$in: postData}}, {$inc: {"views": 1}}, {multi: true});
+	v.exec(function(err) {
+	    if (err) return next(err);
+	});
     });
-    //getSinglePost(req.params.id);
 });
 
 router.get('/Text', function(req, res, next) {
@@ -137,15 +190,20 @@ router.get('/Image', function(req, res, next) {
     res.render('Image/index');
 });
 
+router.get('/Search', function(req, res, next) {
+    res.render('Search/index');
+});
+
 /* POST request to /newText creates new text post */
-router.post('/newText', function(req, res, next) {
+router.post('/Text', function(req, res, next) {
     recaptcha.verify(req, function(error) {
 	if(!error) {
 	    var type = req.body.type;
 	    var title = req.body.title;
 	    var content = req.body.content;
 	    var tags = req.body.tags;
-	    var tagsSplit = tags.split(', ');
+	    var tagsLower = tags.toLowerCase();
+	    var tagsSplit = tagsLower.split(', ');
 	    var views = req.body.views;
 
 	    if (tags.indexOf('#') != -1 || tags.indexOf('$') != -1 || tags.indexOf(';') != -1) {
@@ -176,7 +234,7 @@ router.post('/newText', function(req, res, next) {
     });
 });
 
-router.post('/newImage', function(req, res, next) {
+router.post('/Image', function(req, res, next) {
     recaptcha.verify(req, function(error) {
 	if(!error) {
 	    var type = req.body.type;
@@ -185,14 +243,17 @@ router.post('/newImage', function(req, res, next) {
 	    var contentSplit = content.split(', ');
 	    var caption = req.body.caption;
 	    var tags = req.body.tags;
-	    var tagsSplit = tags.split(', ');
+	    var tagsLower = tags.toLowerCase();
+	    var tagsSplit = tagsLower.split(', ');
 	    if (tags.indexOf('#') != -1 || tags.indexOf('$') != -1 || tags.indexOf(';') != -1) {
 		res.send(res.render('error/tagParsing'));
 	    }
-	    Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit}, function(err, imagePost) {
-		if (err) return next(err);
-		res.send(res.render('post/new', {postId: imagePost._id}));
-	    });
+	    else {
+		Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit}, function(err, imagePost) {
+		    if (err) return next(err);
+		    res.send(res.render('post/new', {postId: imagePost._id}));
+		});
+	    }
 	}
 	else {
 	    res.send(res.render('error/reCAPTCHA'));
@@ -200,12 +261,20 @@ router.post('/newImage', function(req, res, next) {
     });
 });
 
-router.get('/tag/:tag', function (req, res, next) {
-    Posts.count({tags: req.params.tag}, function(err, postCount) {
-	Posts.find({tags: req.params.tag}, function(err, postData) {
-	    res.render('index', {post: postData, count: postCount});
-	});
-    });
+router.post('/Search', function(req, res, next) {
+    var search = req.body.search;
+    var type = req.body.type;
+    if (search.indexOf('#') != -1 || search.indexOf('$') != -1 || search.indexOf(';') != -1) {
+	res.send(res.render('error/tagParsing'));
+    }
+    else {
+	if (req.body.type == 'include') {
+	    res.redirect('/tag/'+search);
+	}
+	if (req.body.type == 'exclude') {
+	    res.redirect('/exclude/'+search);
+	}
+    }
 });
 
 module.exports = router;
