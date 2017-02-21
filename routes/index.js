@@ -2,30 +2,27 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 var Posts = require('../dbModels/posts.js');
-var privKey = require('./privKey.js');
 var bodyParser = require('body-parser');
 var recaptcha = require('express-recaptcha');
+var config = require('config');
 
-recaptcha.init('6LcpzREUAAAAAMb2qn7aobDAldkSgBX_fq7tpOXj', global.privKey);
+// config declarations
+var pubKey = config.get('Backend.ReCAPTCHA.pubKey');
+var privKey = config.get('Backend.ReCAPTCHA.privKey');
+var hostURL = config.get('Backend.Host.url');
+var postPerPage = config.get('Frontend.Posts.perPage');
+var viewsPerPage = config.get('Frontend.Posts.viewsPerPage');
 
-/*function getMultiplePosts(limit, viewLimit, page, tag) {
-    
-}
-
-function getSinglePost(id) {
-    Posts.findById(id, function(err, postData) {
-	if(err) res.send(err);
-	res.render('index', {post: postData, pageIdentifier: "single", count: 1});
-    });
-}*/
+// reCAPTCHA initiation
+recaptcha.init(pubKey, privKey);
 
 // GET home page and specify variables.
 router.get('/', function(req, res, next) {
     Posts.count({}, function(err, documentCount){
-	if (documentCount > 100) {
-	    Posts.find({}).sort({"date": 1}).skip(documentCount-100).limit(100).exec( function(err, postData) {
+	if (documentCount > postPerPage) {
+	    Posts.find({}).sort({"date": 1}).skip(documentCount-postPerPage).limit(postPerPage).exec( function(err, postData) {
 		if (err) return next(err);
-		res.render('index', { post: postData, page: 0, count: 100, pageIdentifier: "paginated" });
+		res.render('index', { post: postData, page: 0, count: postPerPage, pageIdentifier: "paginated" });
 	    });
 	}
 	else {
@@ -34,7 +31,7 @@ router.get('/', function(req, res, next) {
 		res.render('index', { post: postData, count: documentCount });
 	    });
 	}
-	Posts.find({}).sort({"date": -1})/*.skip(documentCount-100)*/.limit(20).exec( function(err, data) {
+	Posts.find({}).sort({"date": -1}).limit(viewsPerPage).exec( function(err, data) {
             var v = Posts.update({"_id": {$in: data}}, {$inc: {"views": 1}}, {multi: true});
             v.exec(function(err) {
 		if (err) return next(err);
@@ -44,21 +41,22 @@ router.get('/', function(req, res, next) {
     });
 });
 
+// GET next pages after first
 router.get('/page/:page', function(req, res, next) {
     Posts.count({}, function(err, documentCount) {
-	if (documentCount%100 != 0 && req.params.page >= parseInt(documentCount/100)) {
-	    Posts.find({}).sort({"date": 1}).limit(documentCount%100).exec( function(err, postData) {
+	if (documentCount%postPerPage != 0 && req.params.page >= parseInt(documentCount/postPerPage)) {
+	    Posts.find({}).sort({"date": 1}).limit(documentCount%postPerPage).exec( function(err, postData) {
 		if (err) return next(err);
-		res.render('index', { post: postData, count: documentCount%100 });
+		res.render('index', { post: postData, count: documentCount%postPerPage });
 	    });
 	}
 	else {
-	    Posts.find({}).sort({"date": 1}).skip(documentCount-(100*req.params.page)).limit(100).exec( function(err, postData) {
+	    Posts.find({}).sort({"date": 1}).skip(documentCount-(postPerPage*req.params.page)).limit(postPerPage).exec( function(err, postData) {
 		if (err) return next(err);
-		res.render('index', { post: postData, page: req.params.page, count: 100, pageIdentifier: "paginated" });
+		res.render('index', { post: postData, page: req.params.page, count: postPerPage, pageIdentifier: "paginated" });
 	    });
 	}
-	Posts.find({}).sort({"date": -1}).skip(req.params.page*100).limit(20).exec( function(err, data) {
+	Posts.find({}).sort({"date": -1}).skip(req.params.page*postPerPage).limit(viewsPerPage).exec( function(err, data) {
 	    var v = Posts.update({"_id": {$in: data}}, {$inc: {"views": 1}}, {multi: true});
 	    v.exec(function(err) {
 		if (err) return next(err);
@@ -67,15 +65,16 @@ router.get('/page/:page', function(req, res, next) {
     });
 });
 
+// GET tag page(s)
 router.get('/tag/:tag', function(req, res, next) {
     var allTags = req.params.tag;
     var allTagsLower = allTags.toLowerCase();
     var tagSplit = allTagsLower.split(', ');
     Posts.count({tags: { $all: tagSplit } }, function(err, documentCount) {
-	if (documentCount > 100) {
-	    Posts.find({tags: { $all: tagSplit } }).sort({"date": 1}).skip(documentCount-100).limit(100).exec( function(err, postData) {
+	if (documentCount > postPerPage) {
+	    Posts.find({tags: { $all: tagSplit } }).sort({"date": 1}).skip(documentCount-postPerPage).limit(postPerPage).exec( function(err, postData) {
 		if (err) return next(err);
-		res.render('index', { post: postData, page: 0, count: 100, pageIdentifier: "paginated" });
+		res.render('index', { post: postData, page: 0, count: postPerPage, pageIdentifier: "paginated" });
 	    });
 	}
 	else {
@@ -84,7 +83,7 @@ router.get('/tag/:tag', function(req, res, next) {
 		res.render('index', { post: postData, count: documentCount });
 	    });
 	}
-	Posts.find({tags: { $all: tagSplit } }).sort({"date": -1}).limit(20).exec( function(err, data) {
+	Posts.find({tags: { $all: tagSplit } }).sort({"date": -1}).limit(viewsPerPage).exec( function(err, data) {
 	    var v = Posts.update({"_id": {$in: data}}, {$inc: {"views": 1}}, {multi: true});
 	    v.exec(function(err) {
 		if (err) return next(err);
@@ -98,18 +97,18 @@ router.get('/tag/:tag/page/:page', function(req, res, next) {
     var allTagsLower = allTags.toLowerCase();
     var tagSplit = allTagsLower.split(', ');
     Posts.count({tags: { $all: tagSplit }}, function(err, documentCount) {
-	if (documentCount%100 != 0 && req.params.page >= parseInt(documentCount/100)) {
-	    Posts.find({tags: { $all: tagSplit } }).limit(documentCount%100).exec( function(err, postData) {
-		res.render('index', { post: postData, count: documentCount%100 });
+	if (documentCount%postPerPage != 0 && req.params.page >= parseInt(documentCount/postPerPage)) {
+	    Posts.find({tags: { $all: tagSplit } }).limit(documentCount%postPerPage).exec( function(err, postData) {
+		res.render('index', { post: postData, count: documentCount%postPerPage });
 	    });
 	}
 	else {
-	    Posts.find({tags: { $all: tagSplit } }).skip(documentCount-(100*req.params.page)).limit(100).exec( function(err, postData) {
+	    Posts.find({tags: { $all: tagSplit } }).skip(documentCount-(postPerPage*req.params.page)).limit(postPerPage).exec( function(err, postData) {
 		if (err) return next(err);
-		res.render('index', { post: postData, page: req.params.page, count: 100, pageIdentifier: "paginated"});
+		res.render('index', { post: postData, page: req.params.page, count: postPerPage, pageIdentifier: "paginated"});
 	    });
 	}
-	Posts.find({tags: { $all: tagSplit } }).sort({"date": -1}).skip(100*req.params.page).limit(20).exec( function(err, data) {
+	Posts.find({tags: { $all: tagSplit } }).sort({"date": -1}).skip(postPerPage*req.params.page).limit(viewsPerPage).exec( function(err, data) {
 	    var v = Posts.update({"_id": {$in: data}}, {$inc: {"views": 1}}, {multi: true});
 	    v.exec(function(err) {
 		if (err) return next(err);
@@ -118,15 +117,16 @@ router.get('/tag/:tag/page/:page', function(req, res, next) {
     });
 });
 
+// GET exclude page(s)
 router.get('/exclude/:tag', function(req, res, next) {
     var allTags = req.params.tag;
     var allTagsLower = allTags.toLowerCase();
     var tagSplit = allTagsLower.split(', ');
     Posts.count({tags: { $nin: tagSplit } }).exec( function(err, documentCount) {
-	if (documentCount > 100) {
-	    Posts.find({tags: { $nin: tagSplit } }).sort({"date": 1}).skip(documentCount-100).limit(100).exec( function(err, postData) {
+	if (documentCount > postPerPage) {
+	    Posts.find({tags: { $nin: tagSplit } }).sort({"date": 1}).skip(documentCount-postPerPage).limit(postPerPage).exec( function(err, postData) {
 		if (err) return next(err);
-		res.render('index', { post: postData, page: 0, count: 100, pageIdentifier: "paginated" });
+		res.render('index', { post: postData, page: 0, count: postPerPage, pageIdentifier: "paginated" });
 	    });
 	}
 	else {
@@ -136,7 +136,7 @@ router.get('/exclude/:tag', function(req, res, next) {
 		res.render('index', { post: postData, count: documentCount });
 	    });
 	}
-	Posts.find({tags: { $nin: tagSplit } }).sort({"date": -1}).limit(20).exec( function(err, data) {
+	Posts.find({tags: { $nin: tagSplit } }).sort({"date": -1}).limit(viewsPerPage).exec( function(err, data) {
 	    var v = Posts.update({"_id": {$in: data}}, {$inc: {"views": 1}}, {multi: true});
 	    v.exec(function(err) {
 		if (err) return next(err);
@@ -150,18 +150,18 @@ router.get('/exclude/:tag/page/:page', function(req, res, next) {
     var allTagsLower = allTags.toLowerCase();
     var tagSplit = allTagsLower.split(', ');
     Posts.count({tags: { $nin: tagSplit }}, function(err, documentCount) {
-	if (documentCount%100 != 0 && req.params.page >= parseInt(documentCount/100)) {
-	    Posts.find({tags: { $nin: tagSplit } }).limit(documentCount%100).exec( function(err, postData) {
-		res.render('index', { post: postData, count: documentCount%100 });
+	if (documentCount%postPerPage != 0 && req.params.page >= parseInt(documentCount/postPerPage)) {
+	    Posts.find({tags: { $nin: tagSplit } }).limit(documentCount%postPerPage).exec( function(err, postData) {
+		res.render('index', { post: postData, count: documentCount%postPerPage });
 	    });
 	}
 	else {
-	    Posts.find({tags: { $nin: tagSplit } }).skip(documentCount-(100*req.params.page)).limit(100).exec( function(err, postData) {
+	    Posts.find({tags: { $nin: tagSplit } }).skip(documentCount-(postPerPage*req.params.page)).limit(postPerPage).exec( function(err, postData) {
 		if (err) return next(err);
-		res.render('index', { post: postData, page: req.params.page, count: 100, pageIdentifier: "paginated"});
+		res.render('index', { post: postData, page: req.params.page, count: postPerPage, pageIdentifier: "paginated"});
 	    });
 	}
-	Posts.find({tags: { $nin: tagSplit } }).sort({"date": -1}).skip(100*req.params.page).limit(20).exec( function(err, data) {
+	Posts.find({tags: { $nin: tagSplit } }).sort({"date": -1}).skip(postPerPage*req.params.page).limit(viewsPerPage).exec( function(err, data) {
 	    var v = Posts.update({"_id": {$in: data}}, {$inc: {"views": 1}}, {multi: true});
 	    v.exec(function(err) {
 		if (err) return next(err);
@@ -170,7 +170,7 @@ router.get('/exclude/:tag/page/:page', function(req, res, next) {
     });
 });
 
-
+// GET singular post
 router.get('/postId/:id', function (req, res, next) {
     Posts.find({"_id": req.params.id}, function(err, postData) {
 	if(err) res.send(err);
@@ -182,6 +182,7 @@ router.get('/postId/:id', function (req, res, next) {
     });
 });
 
+// GET pages for Search and new Text and Image posts
 router.get('/Text', function(req, res, next) {
     res.render('Text/index', { captcha:recaptcha.render() });
 });
@@ -194,7 +195,7 @@ router.get('/Search', function(req, res, next) {
     res.render('Search/index');
 });
 
-/* POST request to /newText creates new text post */
+// POST request to /Text or /Image creates new respective post
 router.post('/Text', function(req, res, next) {
     recaptcha.verify(req, function(error) {
 	if(!error) {
@@ -224,7 +225,7 @@ router.post('/Text', function(req, res, next) {
 
 		Posts.create({type: type, title: title, content: content, tags: tagsSplit, views: views}, function(err, textPost) {
 		if (err) return next(err);
-		res.send(res.render('post/new', {postId: textPost._id}));
+		    res.send(res.render('post/new', {postId: textPost._id, host: hostURL}));
 	    });
 	    }
 	}
@@ -251,7 +252,7 @@ router.post('/Image', function(req, res, next) {
 	    else {
 		Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit}, function(err, imagePost) {
 		    if (err) return next(err);
-		    res.send(res.render('post/new', {postId: imagePost._id}));
+		    res.send(res.render('post/new', {postId: imagePost._id, host: hostURL}));
 		});
 	    }
 	}
@@ -261,6 +262,7 @@ router.post('/Image', function(req, res, next) {
     });
 });
 
+// POST for search requests
 router.post('/Search', function(req, res, next) {
     var search = req.body.search;
     var type = req.body.type;
