@@ -4,6 +4,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var config = require('config');
+
+var dbURL = config.get('Backend.DB.host');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -12,7 +15,7 @@ var app = express();
 //mongodb setup
 var mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/patsr').then(() => console.log('connection successful!')).catch((err) => console.error(err));
+mongoose.connect(dbURL).then(() => console.log('Connection successful! Connected to: '+dbURL)).catch((err) => console.error(err));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
