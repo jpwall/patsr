@@ -1,0 +1,20 @@
+{
+    "Backend": {
+	"DB": {
+	    "host": "mongodb://localhost/patsr" // or mongodb://externalserver.com/patsr or similar
+	},
+	"ReCAPTCHA": {
+	    "privKey": "PRIVKEY", // replace with private key from google reCAPTCHA signup
+	    "pubKey": "PUBKEY" // replace with public key from google reCAPTCHA signup
+	},
+	"Host": {
+	    "url": "example.com" // or patsr.co, patsr.example.com, wherever PATSR will be hosted
+	}
+    },
+    "Frontend": {
+	"Posts": {
+	    "perPage": 100, // how many posts per page
+	    "viewsPerPage": 20 // how many views per page load (index, tag pages, etc.)
+	}
+    }
+}
