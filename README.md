@@ -1,5 +1,5 @@
 # PATSR
-A simple social network based on anonymity, tags, and sharing - currently located at patsr.jessewalling.com but will be moved to patsr.co after purchase of domain name
+A simple social network based on anonymity, tags, and sharing - currently located at (patsr.jessewalling.com) but will be moved to (patsr.co) after purchase of domain name
 
 *Pull requests and issues are encouraged!*
 ## Installation
