@@ -184,11 +184,11 @@ router.get('/postId/:id', function (req, res, next) {
 
 // GET pages for Search and new Text and Image posts
 router.get('/Text', function(req, res, next) {
-    res.render('Text/index', { captcha:recaptcha.render() });
+    res.render('Text/index', { key: pubKey });
 });
 
 router.get('/Image', function(req, res, next) {
-    res.render('Image/index');
+    res.render('Image/index', { key: pubKey });
 });
 
 router.get('/Search', function(req, res, next) {
