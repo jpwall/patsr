@@ -12,29 +12,49 @@ block content
     - for (var i = count-1; i >= 0; i--) {
       - if (post[i].type == "text") {
       div.postBox
-        div.titleBox
-          div.bigTitle!=post[i].title
-          div.normalText!="VIEWS: "+post[i].views
-        div.normalText!=post[i].content
-        div.tagContainer
-        - for (var j = 0; j < post[i].tags.length; j++) {
-          - if (post[i].tags[j] != "") {
-            a.tag(href="/tag/"+post[i].tags[j])!="#"+post[i].tags[j]+"  "
+        - if (post[i].references != 0) {
+          - for (var j = 0; j < post[i].references.length; j++) {
+            a.references(href="/postId/"+post[i].references[j])!=post[i].references[j]+"> "
+            br
           - }
         - }
+        div.contentBox
+          div.titleBox
+            div.bigTitle!=post[i].title
+            div.normalText!="VIEWS: "+post[i].views
+          div.normalText!=post[i].content
+        div.idText(style="margin-top:5px;")!="ID: "+post[i]._id
+        - if (post[i].tags != 0) {
+          div.tagContainer
+          - for (var j = 0; j < post[i].tags.length; j++) {
+            - if (post[i].tags[j] != "") {
+              a.tag(href="/tag/"+post[i].tags[j])!="#"+post[i].tags[j]+"  "
+            - }
+          - }
+        - }
+        br
+        a.replyLink(href="/Reply/"+post[i]._id)!="REPLY"
         br
         a.urlLink(href="/postId/"+post[i]._id)!="Permanent URL Link"
       - }
       - if (post[i].type == "image") {
       div.postBox
-        div.titleBox
-          div.bigTitle!=post[i].title
-          div.normalText!="VIEWS: "+post[i].views
-        - for (var j = 0; j < post[i].content.length; j++) {
-          a.imgLink(href=post[i].content[j])
-            img.postImg(src=post[i].content[j] style="max-width:100%;")
+        - if (post[i].references != 0) {
+          - for (var j = 0; j < post[i].references.length; j++) {
+            a.references(href="/postId/"+post[i].references[j])!=post[i].references[j]+"> " 
+            br
+          - }
         - }
-        div.normalText!=post[i].caption
+        div.contentBox
+          div.titleBox
+            div.bigTitle!=post[i].title
+            div.normalText!="VIEWS: "+post[i].views
+          - for (var j = 0; j < post[i].content.length; j++) {
+            a.imgLink(href=post[i].content[j])
+              img.postImg(src=post[i].content[j] style="max-width:100%;")
+          - }
+          div.normalText!=post[i].caption
+        div.idText(style="margin-top:5px;")!="ID: "+post[i]._id
         div.tagContainer
         - for (var j = 0; j < post[i].tags.length; j++) {
           - if (post[i].tags[j] != "") {
@@ -42,7 +62,69 @@ block content
           - }
         - }
         br
+        a.replyLink(href="/Reply/"+post[i]._id)!="REPLY"
+        br
         a.urlLink(href="/postId/"+post[i]._id)!="Permanent URL Link"
+      - }
+    - }
+    - if (pageIdentifier == "single") {
+      - if (count == 1 && postChild != null) {
+        - for (var i = countChild-1; i >= 0; i--) {
+          - if (postChild[i].type == "text") {
+          div.postBoxComment
+            - if (postChild[i].references != 0) {
+              - for (var j = 0; j < postChild[i].references.length; j++) {
+                a.references(href="/postId/"+postChild[i].references[j])!=postChild[i].references[j]+"> "
+                br
+              - }
+            - }
+            div.contentBox
+              div.titleBox
+                div.bigTitle!=postChild[i].title
+                div.normalText!="VIEWS: "+postChild[i].views
+              div.normalText!=postChild[i].content
+            div.idText(style="margin-top:5px;")!="ID: "+postChild[i]._id
+            div.tagContainer
+            - for (var j = 0; j < postChild[i].tags.length; j++) {
+              - if (postChild[i].tags[j] != "") {
+                a.tag(href="/tag/"+postChild[i].tags[j])!="#"+postChild[i].tags[j]+"  "
+              - }
+            - }
+            br
+            a.replyLink(href="/Reply/"+postChild[i]._id)!="REPLY"
+            br
+            a.urlLink(href="/postId/"+postChild[i]._id)!="Permanent URL Link"
+          - }
+          - if (postChild[i].type == "image") {
+          div.postBoxComment
+            - if (postChild[i].references != 0) {
+              - for (var j = 0; j < postChild[i].references.length; j++) {
+                a.references(href="/postId/"+postChild[i].references[j])!=postChild[i].references[j]+"> " 
+                br
+              - }
+            - }
+            div.contentBox
+              div.titleBox
+                div.bigTitle!=postChild[i].title
+                div.normalText!="VIEWS: "+postChild[i].views
+              - for (var j = 0; j < postChild[i].content.length; j++) {
+                a.imgLink(href=postChild[i].content[j])
+                  img.postImg(src=postChild[i].content[j] style="max-width:100%;")
+              - }
+              div.normalText!=postChild[i].caption
+            div.idText(style="margin-top:5px;")!="ID: "+postChild[i]._id
+            div.tagContainer
+            - for (var j = 0; j < postChild[i].tags.length; j++) {
+              - if (postChild[i].tags[j] != "") {
+                a.tag(href="/tag/"+postChild[i].tags[j])!="#"+postChild[i].tags[j]+"  "
+              - }
+            - }
+            br
+            a.replyLink(href="/Reply/"+postChild[i]._id)!="REPLY"
+            br
+            a.urlLink(href="/postId/"+postChild[i]._id)!="Permanent URL Link"
+          - }  
+        - }
       - }
     - }
     - if (pageIdentifier == "paginated") {
