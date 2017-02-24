@@ -12,15 +12,30 @@ body {
 }
 
 .bigTitle {
-    font-size: 35px;
+    font-size: 40px;
     white-space: normal;
     word-break: break-all;
 }
 
 .normalText {
-    font-size: 18px;
+    font-size: 20px;
     //white-space: normal;
     //word-break: break-all;
+}
+
+.idText {
+    font-size: 15px;
+    color: #adffe2;
+}
+
+.references {
+    font-size: 15px;
+    color: #66a0ff;
+}
+
+.replyLink {
+    font-size: 15px;
+    color: #66a0ff;
 }
 
 .newPostHeader {
@@ -53,11 +68,26 @@ body {
     -webkit-box-sizing: border-box;
     box-sizing: border-box;
     width: 60%;
-    //border-width: 5px;
-    //border-style: solid;
     margin-bottom: 5px;
     padding: 30px 20px 30px 20px;
     background: #333333;
+}
+
+.contentBox {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 20px 0px 20px 0px;
+}
+
+.postBoxComment {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 56%;
+    margin-bottom: 5px;
+    padding: 30px 20px 30px 20px;
+    background: #444444;
 }
 
 .titleBox {
@@ -71,6 +101,8 @@ body {
 
 .tagContainer {
     margin-bottom: 10px;
+    min-height: 0px;
+    font-size: 15px;
 }
 
 .tag {
