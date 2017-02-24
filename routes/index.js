@@ -173,13 +173,27 @@ router.get('/exclude/:tag/page/:page', function(req, res, next) {
 // GET singular post
 router.get('/postId/:id', function (req, res, next) {
     Posts.find({"_id": req.params.id}, function(err, postData) {
+	Posts.count({references: { $all: req.params.id }}, function(err, childCount) {
+	    Posts.find({references: { $all: req.params.id }}).sort({"date": 1}).exec( function(err, postSmol) {
+		res.render('index', { post: postData, count: 1, postChild: postSmol, countChild: childCount, pageIdentifier: "single" });
+		console.log('test');
+		var v = Posts.update({"_id": {$in: postData}}, {$inc: {"views": 1}}, {multi: true});
+		v.exec(function(err) {
+		    if (err) return next(err);
+		});
+	    });
+	});
 	if(err) res.send(err);
-	res.render('index', { post: postData, count: 1 });
+	//res.render('index', { post: postData, count: 1 });
 	var v = Posts.update({"_id": {$in: postData}}, {$inc: {"views": 1}}, {multi: true});
 	v.exec(function(err) {
 	    if (err) return next(err);
 	});
     });
+});
+
+router.get('/Reply/:id', function(req, res, next) {
+    res.render('Text/index', { key: pubKey, type: "single-reply", reference: req.params.id });
 });
 
 // GET pages for Search and new Text and Image posts
@@ -206,27 +220,29 @@ router.post('/Text', function(req, res, next) {
 	    var tagsLower = tags.toLowerCase();
 	    var tagsSplit = tagsLower.split(', ');
 	    var views = req.body.views;
-
+	    var references = req.body.references;
+	    var referencesSplit = references.split(', ');
+	    
 	    if (tags.indexOf('#') != -1 || tags.indexOf('$') != -1 || tags.indexOf(';') != -1) {
 		res.send(res.render('error/tagParsing'));
 	    }
 	    else {
-	    if (title != null) {
-		title = title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-	    }
-	    if (content != null) {
-		content = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-	    }
-	    for (var i = 0; i < tagsSplit.length; i++) {
-		if (tagsSplit[i] != null) {
-		    tagsSplit[i] = tagsSplit[i].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		if (title != null) {
+		    title = title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 		}
-	    }
+		if (content != null) {
+		    content = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		}
+		for (var i = 0; i < tagsSplit.length; i++) {
+		    if (tagsSplit[i] != null) {
+			tagsSplit[i] = tagsSplit[i].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		    }
+		}
 
-		Posts.create({type: type, title: title, content: content, tags: tagsSplit, views: views}, function(err, textPost) {
-		if (err) return next(err);
+		Posts.create({type: type, title: title, content: content, tags: tagsSplit, views: views, references: referencesSplit}, function(err, textPost) {
+		    if (err) return next(err);
 		    res.send(res.render('post/new', {postId: textPost._id, host: hostURL}));
-	    });
+		});
 	    }
 	}
 	else {
@@ -246,11 +262,25 @@ router.post('/Image', function(req, res, next) {
 	    var tags = req.body.tags;
 	    var tagsLower = tags.toLowerCase();
 	    var tagsSplit = tagsLower.split(', ');
+	    var references = req.body.references;
+	    var referencesSplit = references.split(', ');
+
 	    if (tags.indexOf('#') != -1 || tags.indexOf('$') != -1 || tags.indexOf(';') != -1) {
 		res.send(res.render('error/tagParsing'));
 	    }
 	    else {
-		Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit}, function(err, imagePost) {
+		if (title != null) {
+		    title = title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		}
+		if (content != null) {
+		    content = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		}
+		for (var i = 0; i < tagsSplit.length; i++) {
+		    if (tagsSplit[i] != null) {
+			tagsSplit[i] = tagsSplit[i].replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		    }
+		}
+		Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit, references: referencesSplit}, function(err, imagePost) {
 		    if (err) return next(err);
 		    res.send(res.render('post/new', {postId: imagePost._id, host: hostURL}));
 		});
