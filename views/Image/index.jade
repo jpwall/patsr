@@ -4,6 +4,7 @@ block content
   script(src="https://www.google.com/recaptcha/api.js")
   form#formNewPost.postContainer(name="addpost", method="post", action="/Image")
     input(type="hidden", name="type", value="image")
+    input#inputImage.inputBox(type="text", placeholder="Reference Posts - ID of post[s] intending to reply or comment on (separated by commas)", name="references", value=reference)
     input#inputImage.inputBox(type="text", placeholder="Title", name="title")
     input#inputImage.inputBox(type="text", placeholder="Image Link URLs (separated by commas)", name="content")
     input#inputImage.inputBox(type="text", placeholder="Caption", name="caption")
