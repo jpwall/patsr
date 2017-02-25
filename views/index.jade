@@ -47,11 +47,21 @@ block content
         - }
         div.contentBox
           div.titleBox
-            div.bigTitle!=post[i].title
+            - if (post[i].nsfw == "true") {
+              div.bigTitle!=post[i].title+" [NSFW]"
+            - }
+            - if (post[i].nsfw != "true") {
+              div.bigTitle!=post[i].title
+            - }
             div.normalText!="VIEWS: "+post[i].views
           - for (var j = 0; j < post[i].content.length; j++) {
             a.imgLink(href=post[i].content[j])
-              img.postImg(src=post[i].content[j] style="max-width:100%;")
+              - if (post[i].nsfw == "true") {
+                img.postImg(src=post[i].content[j], style="filter:blur(25px);padding:25px;")
+              - }
+              - if (post[i].nsfw != "true") {
+                img.postImg(src=post[i].content[j])
+              - }
           - }
           div.normalText!=post[i].caption
         div.idText(style="margin-top:5px;")!="ID: "+post[i]._id
@@ -105,11 +115,21 @@ block content
             - }
             div.contentBox
               div.titleBox
-                div.bigTitle!=postChild[i].title
+                - if (postChild[i].nsfw == "true") {
+                  div.bigTitle!=postChild[i].title+" [NSFW]"
+                - }
+                - if (postChild[i].nsfw != "true") {
+                  div.bigTitle!=postChild[i].title
+                - }
                 div.normalText!="VIEWS: "+postChild[i].views
               - for (var j = 0; j < postChild[i].content.length; j++) {
                 a.imgLink(href=postChild[i].content[j])
-                  img.postImg(src=postChild[i].content[j] style="max-width:100%;")
+                  - if (postChild[i].nsfw == "true") {
+                    img.postImg(src=postChild[i].content[j], style="filter:blur(25px);padding:25px;")
+                  - }
+                  - if (postChild[i].nsfw != "true") {
+                    img.postImg(src=postChild[i].content[j])
+                  - }
               - }
               div.normalText!=postChild[i].caption
             div.idText(style="margin-top:5px;")!="ID: "+postChild[i]._id
