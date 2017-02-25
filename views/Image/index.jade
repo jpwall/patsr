@@ -9,6 +9,9 @@ block content
     input#inputImage.inputBox(type="text", placeholder="Image Link URLs (separated by commas)", name="content")
     input#inputImage.inputBox(type="text", placeholder="Caption", name="caption")
     input#inputImage.inputBox(type="text", placeholder="Tags (separated by commas)", name="tags")
+    div.checkboxContainer
+      input.checkbox(type="checkbox", name="nsfw", value="true") 
+      p.normalText Includes NSFW content - i.e. not suitable for the workplace
     div.g-recaptcha(data-sitekey=key)
     button(type="submit")
       div.postButton Post
