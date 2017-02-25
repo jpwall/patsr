@@ -264,7 +264,8 @@ router.post('/Image', function(req, res, next) {
 	    var tagsSplit = tagsLower.split(', ');
 	    var references = req.body.references;
 	    var referencesSplit = references.split(', ');
-
+	    var nsfw = req.body.nsfw;
+	    
 	    if (tags.indexOf('#') != -1 || tags.indexOf('$') != -1 || tags.indexOf(';') != -1) {
 		res.send(res.render('error/tagParsing'));
 	    }
@@ -280,7 +281,7 @@ router.post('/Image', function(req, res, next) {
 			tagsSplit[i] = tagsSplit[i].replace(/</g, "&lt;").replace(/>/g, "&gt;");
 		    }
 		}
-		Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit, references: referencesSplit}, function(err, imagePost) {
+		Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit, references: referencesSplit, nsfw: nsfw}, function(err, imagePost) {
 		    if (err) return next(err);
 		    res.send(res.render('post/new', {postId: imagePost._id, host: hostURL}));
 		});
