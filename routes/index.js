@@ -5,6 +5,7 @@ var Posts = require('../dbModels/posts.js');
 var bodyParser = require('body-parser');
 var recaptcha = require('express-recaptcha');
 var config = require('config');
+var parseMarkdown = require('../markdown/md.js').parseMarkdown;
 
 // config declarations
 var pubKey = config.get('Backend.ReCAPTCHA.pubKey');
@@ -12,6 +13,7 @@ var privKey = config.get('Backend.ReCAPTCHA.privKey');
 var hostURL = config.get('Backend.Host.url');
 var postPerPage = config.get('Frontend.Posts.perPage');
 var viewsPerPage = config.get('Frontend.Posts.viewsPerPage');
+
 
 // reCAPTCHA initiation
 recaptcha.init(pubKey, privKey);
@@ -209,6 +211,7 @@ router.get('/Search', function(req, res, next) {
     res.render('Search/index');
 });
 
+const stripTag = tag => tag.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 // POST request to /Text or /Image creates new respective post
 router.post('/Text', function(req, res, next) {
     recaptcha.verify(req, function(error) {
@@ -222,27 +225,28 @@ router.post('/Text', function(req, res, next) {
 	    var views = req.body.views;
 	    var references = req.body.references;
 	    var referencesSplit = references.split(', ');
-	    
+
 	    if (tags.indexOf('#') != -1 || tags.indexOf('$') != -1 || tags.indexOf(';') != -1) {
-		res.send(res.render('error/tagParsing'));
+		    res.send(res.render('error/tagParsing'));
 	    }
 	    else {
-		if (title != null) {
-		    title = title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-		}
-		if (content != null) {
-		    content = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-		}
-		for (var i = 0; i < tagsSplit.length; i++) {
-		    if (tagsSplit[i] != null) {
-			tagsSplit[i] = tagsSplit[i].replace(/</g, "&lt;").replace(/>/g, "&gt;");
-		    }
-		}
+    		if (title != null) {
+    		    title = parseMarkdown(title).filterTags(['img']).toHtml();
+    		}
+    		if (content != null) {
+    		    content = parseMarkdown(content).filterTags(['img']).toHtml();
+    		}
 
-		Posts.create({type: type, title: title, content: content, tags: tagsSplit, views: views, references: referencesSplit}, function(err, textPost) {
-		    if (err) return next(err);
-		    res.send(res.render('post/new', {postId: textPost._id, host: hostURL}));
-		});
+            for (var i = 0; i < tagsSplit.length; i++) {
+                if (tagsSplit[i] != null) {
+                    tagsSplit[i] = stripTag(tagsSplit[i])
+                }
+            }
+
+    		Posts.create({type: type, title: title, content: content, tags: tagsSplit, views: views, references: referencesSplit}, function(err, textPost) {
+    		    if (err) return next(err);
+    		    res.send(res.render('post/new', {postId: textPost._id, host: hostURL}));
+    		});
 	    }
 	}
 	else {
@@ -265,23 +269,29 @@ router.post('/Image', function(req, res, next) {
 	    var references = req.body.references;
 	    var referencesSplit = references.split(', ');
 	    var nsfw = req.body.nsfw;
-	    
+
 	    if (tags.indexOf('#') != -1 || tags.indexOf('$') != -1 || tags.indexOf(';') != -1) {
 		res.send(res.render('error/tagParsing'));
 	    }
 	    else {
 		if (title != null) {
-		    title = title.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		    title = parseMarkdown(title).filterTags(['img']).toHtml()
 		}
 		if (content != null) {
-		    content = content.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+		    content = stripTag(content)
 		}
-		for (var i = 0; i < tagsSplit.length; i++) {
-		    if (tagsSplit[i] != null) {
-			tagsSplit[i] = tagsSplit[i].replace(/</g, "&lt;").replace(/>/g, "&gt;");
-		    }
-		}
+
+        if (caption != null) {
+            caption = parseMarkdown(caption).filterTags(['img']).toHtml()
+        }
+
+        for (var i = 0; i < tagsSplit.length; i++) {
+            if (tagsSplit[i] != null) {
+                tagsSplit[i] = stripTag(tagsSplit[i])
+            }
+        }
 		Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit, references: referencesSplit, nsfw: nsfw}, function(err, imagePost) {
+
 		    if (err) return next(err);
 		    res.send(res.render('post/new', {postId: imagePost._id, host: hostURL}));
 		});
