@@ -275,19 +275,19 @@ router.post('/Image', function(req, res, next) {
 	    }
 	    else {
 		if (title != null) {
-		    title = parseMarkdown(title).filterTags(['img']).toHtml()
+		    title = parseMarkdown(title).filterTags(['img']).toHtml();
 		}
 		if (content != null) {
-		    content = stripTag(content)
+		    content = stripTag(content);
 		}
 
         if (caption != null) {
-            caption = parseMarkdown(caption).filterTags(['img']).toHtml()
+            caption = parseMarkdown(caption).filterTags(['img']).toHtml();
         }
 
         for (var i = 0; i < tagsSplit.length; i++) {
             if (tagsSplit[i] != null) {
-                tagsSplit[i] = stripTag(tagsSplit[i])
+                tagsSplit[i] = stripTag(tagsSplit[i]);
             }
         }
 		Posts.create({type: type, title: title, content: contentSplit, caption: caption, tags: tagsSplit, references: referencesSplit, nsfw: nsfw}, function(err, imagePost) {
