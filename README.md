@@ -11,7 +11,7 @@ git clone https://github.com/jpwall/patsr
 cd patsr
 npm install
 ```
-At this point it is necessary to install the database. For PATSR, mongodb is used.
+At this point it is necessary to install the database. For PATSR, MongoDB is used.
 
 `[sudo] apt-get install mongodb-org` _for Debian 7/8 and LTS 64-bit Ubuntu installations_ and
 
