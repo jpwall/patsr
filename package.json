@@ -5,6 +5,9 @@
   "scripts": {
     "start": "node ./bin/www"
   },
+  "bin": {
+    "patsr": "bin/www"
+  },
   "dependencies": {
     "body-parser": "~1.15.2",
     "config": "^1.25.1",
