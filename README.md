@@ -17,7 +17,7 @@ At this point it is necessary to install the database. For PATSR, mongodb is use
 
 `[sudo] pacman -S mongodb` _for Arch Linux_
 
-Starting the database must be done in order for PATSR to work. This is done by executing `mongod` in Ubuntu or Debian and by starting the `mongodb.service` in Arch Linux.
+Starting the database must be done in order for PATSR to work. This can be done with `[sudo] systemctl start mongodb.service` under systemd systems, which includes most modern distros.
 ## Configuration
 ### Database
 All the configuration is done in `config/default.json`
