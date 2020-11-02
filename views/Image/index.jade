@@ -1,7 +1,6 @@
 extends ../layout
 
 block content
-  script(src="https://www.google.com/recaptcha/api.js")
   form#formNewPost.postContainer(name="addpost", method="post", action="/Image")
     input(type="hidden", name="type", value="image")
     input#inputImage.inputBox(type="text", placeholder="Reference Posts - ID of post[s] intending to reply or comment on (separated by commas)", name="references", value=reference)
@@ -12,7 +11,6 @@ block content
     div.checkboxContainer
       input.checkbox(type="checkbox", name="nsfw", value="true") 
       p.normalText Includes NSFW content - i.e. not suitable for the workplace
-    div.g-recaptcha(data-sitekey=key)
     button(type="submit")
       div.postButton Post
     

@@ -1,13 +1,11 @@
 extends ../layout
 
 block content
-  script(src="https://www.google.com/recaptcha/api.js")
   form#formNewPost.postContainer(name="addpost", method="post", action="/Text")
     input(type="hidden", name="type", value="text")
     input#inputText.inputBox(type="text", placeholder="Reference Posts - ID of post[s] intending to reply or comment on (separated by commas)", name="references", value=reference)
     input#inputText.inputBox(type="text", placeholder="Title", name="title")
     input#inputText.inputBox(type="text", placeholder="Content", name="content")
     input#inputText.inputBox(type="text", placeholder="Tags (separated by commas)", name="tags")
-    div.g-recaptcha(data-sitekey=key)
     button(type="submit")
       div.postButton Post

@@ -8,7 +8,7 @@
 	    "pubKey": "PUBKEY" // replace with public key from google reCAPTCHA signup
 	},
 	"Host": {
-	    "url": "example.com" // or patsr.co, patsr.example.com, wherever PATSR will be hosted
+	    "url": "localhost:3000" // or patsr.co, patsr.example.com, wherever PATSR will be hosted
 	}
     },
     "Frontend": {

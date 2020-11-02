@@ -3,20 +3,20 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var Posts = require('../dbModels/posts.js');
 var bodyParser = require('body-parser');
-var recaptcha = require('express-recaptcha');
+//var recaptcha = require('express-recaptcha');
 var config = require('config');
 var parseMarkdown = require('../markdown/md.js').parseMarkdown;
 
 // config declarations
-var pubKey = config.get('Backend.ReCAPTCHA.pubKey');
-var privKey = config.get('Backend.ReCAPTCHA.privKey');
+//var pubKey = config.get('Backend.ReCAPTCHA.pubKey');
+//var privKey = config.get('Backend.ReCAPTCHA.privKey');
 var hostURL = config.get('Backend.Host.url');
 var postPerPage = config.get('Frontend.Posts.perPage');
 var viewsPerPage = config.get('Frontend.Posts.viewsPerPage');
 
 
 // reCAPTCHA initiation
-recaptcha.init(pubKey, privKey);
+//recaptcha.init(pubKey, privKey);
 
 // GET home page and specify variables.
 router.get('/', function(req, res, next) {
@@ -195,16 +195,16 @@ router.get('/postId/:id', function (req, res, next) {
 });
 
 router.get('/Reply/:id', function(req, res, next) {
-    res.render('Text/index', { key: pubKey, type: "single-reply", reference: req.params.id });
+    res.render('Text/index', { key: "", type: "single-reply", reference: req.params.id });
 });
 
 // GET pages for Search and new Text and Image posts
 router.get('/Text', function(req, res, next) {
-    res.render('Text/index', { key: pubKey });
+    res.render('Text/index', { key: "" });
 });
 
 router.get('/Image', function(req, res, next) {
-    res.render('Image/index', { key: pubKey });
+    res.render('Image/index', { key: "" });
 });
 
 router.get('/Search', function(req, res, next) {
@@ -214,50 +214,45 @@ router.get('/Search', function(req, res, next) {
 const stripTag = tag => tag.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 // POST request to /Text or /Image creates new respective post
 router.post('/Text', function(req, res, next) {
-    recaptcha.verify(req, function(error) {
-	if(!error) {
-	    var type = req.body.type;
-	    var title = req.body.title;
-	    var content = req.body.content;
-	    var tags = req.body.tags;
-	    var tagsLower = tags.toLowerCase();
-	    var tagsSplit = tagsLower.split(', ');
-	    var views = req.body.views;
-	    var references = req.body.references;
-	    var referencesSplit = references.split(', ');
-
-	    if (tags.indexOf('#') != -1 || tags.indexOf('$') != -1 || tags.indexOf(';') != -1) {
-		    res.send(res.render('error/tagParsing'));
-	    }
-	    else {
-    		if (title != null) {
-    		    title = parseMarkdown(title).filterTags(['img']).toHtml();
-    		}
-    		if (content != null) {
-    		    content = parseMarkdown(content).filterTags(['img']).toHtml();
-    		}
-
-            for (var i = 0; i < tagsSplit.length; i++) {
-                if (tagsSplit[i] != null) {
-                    tagsSplit[i] = stripTag(tagsSplit[i])
-                }
+    /*recaptcha.verify(req, function(error) {
+	if(!error) {*/
+	var type = req.body.type;
+	var title = req.body.title;
+	var content = req.body.content;
+	var tags = req.body.tags;
+	var tagsLower = tags.toLowerCase();
+	var tagsSplit = tagsLower.split(', ');
+	var views = req.body.views;
+	var references = req.body.references;
+	var referencesSplit = references.split(', ');
+	if (tags.indexOf('#') != -1 || tags.indexOf('$') != -1 || tags.indexOf(';') != -1) {
+	    res.send(res.render('error/tagParsing'));
+	} else {
+    	if (title != null) {
+    	    title = parseMarkdown(title).filterTags(['img']).toHtml();
+    	}
+    	if (content != null) {
+    	    content = parseMarkdown(content).filterTags(['img']).toHtml();
+    	}
+        for (var i = 0; i < tagsSplit.length; i++) {
+            if (tagsSplit[i] != null) {
+                tagsSplit[i] = stripTag(tagsSplit[i])
             }
-
-    		Posts.create({type: type, title: title, content: content, tags: tagsSplit, views: views, references: referencesSplit}, function(err, textPost) {
-    		    if (err) return next(err);
-    		    res.send(res.render('post/new', {postId: textPost._id, host: hostURL}));
-    		});
-	    }
+        }
+    	Posts.create({type: type, title: title, content: content, tags: tagsSplit, views: views, references: referencesSplit}, function(err, textPost) {
+    	    if (err) return next(err);
+    	    res.send(res.render('post/new', {postId: textPost._id, host: hostURL}));
+    	});
 	}
-	else {
+	/*else {
 	    res.send(res.render('error/reCAPTCHA'));
 	}
-    });
+    });*/
 });
 
 router.post('/Image', function(req, res, next) {
-    recaptcha.verify(req, function(error) {
-	if(!error) {
+    //recaptcha.verify(req, function(error) {
+	//if(!error) {
 	    var type = req.body.type;
 	    var title = req.body.title;
 	    var content = req.body.content;
@@ -296,11 +291,11 @@ router.post('/Image', function(req, res, next) {
 		    res.send(res.render('post/new', {postId: imagePost._id, host: hostURL}));
 		});
 	    }
-	}
+	/*}
 	else {
 	    res.send(res.render('error/reCAPTCHA'));
 	}
-    });
+    });*/
 });
 
 // POST for search requests
