@@ -231,9 +231,9 @@ router.post('/Text', function(req, res, next) {
     	if (title != null) {
     	    title = parseMarkdown(title).filterTags(['img']).toHtml();
     	}
-    	if (content != null) {
+    	/*if (content != null) {
     	    content = parseMarkdown(content).filterTags(['img']).toHtml();
-    	}
+    	}*/
         for (var i = 0; i < tagsSplit.length; i++) {
             if (tagsSplit[i] != null) {
                 tagsSplit[i] = stripTag(tagsSplit[i])
@@ -272,9 +272,9 @@ router.post('/Image', function(req, res, next) {
 		if (title != null) {
 		    title = parseMarkdown(title).filterTags(['img']).toHtml();
 		}
-		if (content != null) {
+		/*if (content != null) {
 		    content = stripTag(content);
-		}
+		}*/
 
         if (caption != null) {
             caption = parseMarkdown(caption).filterTags(['img']).toHtml();
